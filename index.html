@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BodyByData: how the app was built</title>
+<meta name="description" content="The build story behind BodyByData: brand, design, and how the app grew out of the Triad package.">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --surface-2: #F7F7F7;
+    --text: #000000;
+    --text-dim: #6E6E6E;
+    --border: #E2E2E2;
+    --accent: #FF0000;
+    --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Consolas, monospace;
+    --font-ui: -apple-system, 'SF Pro Display', system-ui, sans-serif;
+  }
+  [data-theme="dark"] {
+    --bg: #0A0A0A;
+    --surface-2: #161616;
+    --text: #FFFFFF;
+    --text-dim: #9A9A9A;
+    --border: #2A2A2A;
+    --accent: #FF3B30;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-serif);
+    transition: background .3s ease, color .3s ease;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  .shell { max-width: 660px; margin: 0 auto; padding: 60px 24px 70px; }
+
+  .masthead { text-align: center; padding-bottom: 26px; border-bottom: 1px solid var(--border); }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin: 0 0 7px;
+  }
+  .byline {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--text-dim);
+    font-weight: 500;
+    margin: 0 0 3px;
+  }
+  .byline-name {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text);
+    opacity: .55;
+    margin: 0 0 22px;
+  }
+  .wordmark-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 0 0 10px;
+  }
+  .wordmark-row img { width: 34px; height: 34px; display: block; }
+  .wordmark {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 34px;
+    letter-spacing: -0.01em;
+  }
+  .wordmark .mark { color: var(--accent); }
+  .dek {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--text-dim);
+    font-size: 16px;
+    max-width: 460px;
+    margin: 0 auto 14px;
+    line-height: 1.5;
+  }
+  .status-note {
+    font-family: var(--font-mono);
+    text-align: center;
+    font-size: 10.5px;
+    color: var(--text-dim);
+    opacity: .65;
+    margin: 0;
+    letter-spacing: .01em;
+  }
+
+  section.sec { padding: 40px 0; border-bottom: 1px solid var(--border); }
+  section.sec:last-of-type { border-bottom: none; }
+  .sec-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: .05em;
+    margin: 0 0 6px;
+  }
+  .sec h2 {
+    font-family: var(--font-serif);
+    font-size: 23px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0 0 16px;
+  }
+  .sec p {
+    font-size: 16px;
+    line-height: 1.68;
+    color: var(--text);
+    margin: 0 0 14px;
+  }
+  .sec p:last-child { margin-bottom: 0; }
+  .sec p.lede-cap::first-letter {
+    font-size: 2.6em;
+    font-weight: 700;
+    float: left;
+    line-height: .85;
+    margin: 3px 6px 0 0;
+    color: var(--accent);
+  }
+
+  .placeholder-note {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    line-height: 1.55;
+    color: var(--text-dim);
+    background: var(--surface-2);
+    border-left: 2px solid var(--accent);
+    padding: 8px 12px;
+    margin: 0 0 20px;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+  .theme-toggle {
+    position: relative;
+    margin-top: 16px;
+    width: 42px; height: 24px;
+    border-radius: 999px;
+    background: var(--border);
+    border: none;
+    cursor: pointer;
+  }
+  .theme-toggle .knob {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--bg);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    transition: transform .25s ease;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text);
+  }
+  .theme-toggle .knob svg { width: 11px; height: 11px; display: block; }
+  [data-theme="dark"] .theme-toggle .knob { transform: translateX(18px); }
+
+  @media (max-width: 560px) {
+    .wordmark { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <div class="masthead">
+    <p class="eyebrow">Data Science Senior Project</p>
+    <p class="byline">Brigham Young University&nbsp;-&nbsp;Idaho</p>
+    <p class="byline-name">Jonathan Ascona</p>
+    <div class="wordmark-row">
+      <img src="mark-small.png" alt="BodyByData bar chart mark">
+      <div class="wordmark">Body<span>By</span><span class="mark">Data</span></div>
+    </div>
+    <p class="dek">How BodyByData actually got built: the brand, the design decisions, and the app that grew out of Triad.</p>
+    <p class="status-note">In progress, growing alongside the real build</p>
+  </div>
+
+  <section class="sec" id="idea">
+    <p class="sec-num">01</p>
+    <h2>The Idea</h2>
+    <p class="lede-cap">Triad was never meant to be the end of the project. It was scoped from the start as the data foundation for something bigger: a personal fitness intelligence app that could unify sleep, nutrition, and training into one daily answer, packaged for people who are not going to write their own Python pipeline to get it. The research question behind Triad, whether sleep quality and prior training load can predict what a day's workout and calorie target should be, was always meant to power a real, day-to-day product once it was validated.</p>
+    <p class="placeholder-note">This section will grow as the actual BodyByData build progresses in its own project. Next real content needed here: the specific moment the idea crossed from "package" to "app I want other people to use," and what changed in the plan once that decision was made.</p>
+  </section>
+
+  <footer>
+    Jonathan Ascona &middot; dba BodyByData &middot; &copy; 2026. All rights reserved.
+    <br>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+      <span class="knob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><line x1="12" y1="2.5" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="21.5"/><line x1="4.2" y1="4.2" x2="6" y2="6"/><line x1="18" y1="18" x2="19.8" y2="19.8"/><line x1="2.5" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21.5" y2="12"/><line x1="4.2" y1="19.8" x2="6" y2="18"/><line x1="18" y1="6" x2="19.8" y2="4.2"/></svg></span>
+    </button>
+  </footer>
+</div>
+
+<script>
+  const toggle = document.getElementById('themeToggle');
+  const root = document.documentElement;
+  toggle.addEventListener('click', () => {
+    root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+</script>
+
+</body>
+</html>
