@@ -27,6 +27,7 @@
       --code-bg: #111214;
       --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
       --font-mono: "JetBrains Mono", SFMono-Regular, Menlo, Consolas, monospace;
+      --font-ui: -apple-system, "SF Pro Display", system-ui, sans-serif;
       --label-spacing: .075em;
     }
 
@@ -81,24 +82,24 @@
     }
     .byline { margin: 0; color: var(--text-dim); font-size: 10px; text-transform: uppercase; }
     .byline-name { margin: 4px 0 42px; font-size: 15px; font-weight: 600; }
-    .wordmark {
+    .wordmark-row {
       display: flex;
       align-items: center;
-      gap: 13px;
+      gap: 10px;
       margin: 0 0 20px;
-      font-family: var(--font-serif);
-      font-size: clamp(40px, 8vw, 50px);
+    }
+    .wordmark-row img {
+      display: block;
+      width: 34px;
+      height: 34px;
+    }
+    .wordmark {
+      font-family: var(--font-ui);
+      font-size: 34px;
       font-weight: 700;
-      font-style: italic;
       letter-spacing: -.01em;
-      line-height: 1;
     }
-    .wordmark img {
-      width: 42px;
-      height: 42px;
-      object-fit: contain;
-      flex: 0 0 auto;
-    }
+    .wordmark .mark { color: var(--accent); }
     .dek { max-width: 590px; margin: 0; font-size: 25px; line-height: 1.35; color: var(--text); }
     .status-note { margin: 28px 0 0; color: var(--text-dim); font-size: 10px; text-transform: uppercase; }
 
@@ -306,9 +307,9 @@
     <p class="eyebrow">Product and Engineering Case Study</p>
     <p class="byline">Built in public across eight planned sprints</p>
     <p class="byline-name">Jonathan Ascona</p>
-    <div class="wordmark">
-      <img src="assets/bodybydata-symbol.png" alt="" aria-hidden="true">
-      <span>BodyByData</span>
+    <div class="wordmark-row">
+      <img src="mark-small.png" alt="BodyByData bar chart mark">
+      <div class="wordmark">Body<span>By</span><span class="mark">Data</span></div>
     </div>
     <p class="dek">A transparent personal health analytics demo, built to turn fragmented sleep, training, and nutrition data into one inspectable daily picture.</p>
     <p class="status-note">Working public demo · React and FastAPI · every score explains its inputs</p>
