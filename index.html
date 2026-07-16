@@ -1,227 +1,733 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BodyByData: how the app was built</title>
-<meta name="description" content="The build story behind BodyByData: brand, design, and how the app grew out of the Triad package.">
-<link rel="icon" type="image/png" href="favicon.png">
-<link rel="apple-touch-icon" href="favicon-180.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #FFFFFF;
-    --surface-2: #F7F7F7;
-    --text: #000000;
-    --text-dim: #6E6E6E;
-    --border: #E2E2E2;
-    --accent: #FF0000;
-    --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
-    --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Consolas, monospace;
-    --font-ui: -apple-system, 'SF Pro Display', system-ui, sans-serif;
-  }
-  [data-theme="dark"] {
-    --bg: #0A0A0A;
-    --surface-2: #161616;
-    --text: #FFFFFF;
-    --text-dim: #9A9A9A;
-    --border: #2A2A2A;
-    --accent: #FF3B30;
-  }
-  * { box-sizing: border-box; }
-  html { background: var(--bg); }
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-serif);
-    transition: background .3s ease, color .3s ease;
-    min-height: 100vh;
-    min-height: 100dvh;
-  }
-  .shell { max-width: 660px; margin: 0 auto; padding: 60px 24px 70px; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="The engineering case study behind BodyByData, a transparent personal health analytics demo.">
+  <title>BodyByData: Engineering Showcase</title>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;family=Source+Serif+4:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages-bash.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #faf9f7;
+      --surface-2: #f2f0ed;
+      --text: #171717;
+      --text-dim: #67635f;
+      --border: #ddd9d4;
+      --accent: #d52f28;
+      --accent-soft: rgba(213, 47, 40, .09);
+      --code-bg: #111214;
+      --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+      --font-mono: "JetBrains Mono", SFMono-Regular, Menlo, Consolas, monospace;
+      --label-spacing: .075em;
+    }
 
-  .masthead { text-align: center; padding-bottom: 26px; border-bottom: 1px solid var(--border); }
-  .eyebrow {
-    font-family: var(--font-mono);
-    font-size: 10.5px;
-    letter-spacing: .05em;
-    text-transform: uppercase;
-    color: var(--accent);
-    font-weight: 700;
-    margin: 0 0 7px;
-  }
-  .byline {
-    font-family: var(--font-mono);
-    font-size: 11.5px;
-    color: var(--text-dim);
-    font-weight: 500;
-    margin: 0 0 3px;
-  }
-  .byline-name {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text);
-    opacity: .55;
-    margin: 0 0 22px;
-  }
-  .wordmark-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin: 0 0 10px;
-  }
-  .wordmark-row img { width: 34px; height: 34px; display: block; }
-  .wordmark {
-    font-family: var(--font-ui);
-    font-weight: 700;
-    font-size: 34px;
-    letter-spacing: -0.01em;
-  }
-  .wordmark .mark { color: var(--accent); }
-  .dek {
-    font-family: var(--font-serif);
-    font-style: italic;
-    color: var(--text-dim);
-    font-size: 16px;
-    max-width: 460px;
-    margin: 0 auto 14px;
-    line-height: 1.5;
-  }
-  .status-note {
-    font-family: var(--font-mono);
-    text-align: center;
-    font-size: 10.5px;
-    color: var(--text-dim);
-    opacity: .65;
-    margin: 0;
-    letter-spacing: .01em;
-  }
+    [data-theme="dark"] {
+      --bg: #0c0c0d;
+      --surface: #151516;
+      --surface-2: #1d1d1f;
+      --text: #f2f1ef;
+      --text-dim: #aaa6a1;
+      --border: #303033;
+      --accent: #ff453a;
+      --accent-soft: rgba(255, 69, 58, .11);
+      --code-bg: #09090a;
+    }
 
-  section.sec { padding: 40px 0; border-bottom: 1px solid var(--border); }
-  section.sec:last-of-type { border-bottom: none; }
-  .sec-num {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--accent);
-    letter-spacing: .05em;
-    margin: 0 0 6px;
-  }
-  .sec h2 {
-    font-family: var(--font-serif);
-    font-size: 23px;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    margin: 0 0 16px;
-  }
-  .sec p {
-    font-size: 16px;
-    line-height: 1.68;
-    color: var(--text);
-    margin: 0 0 14px;
-  }
-  .sec p:last-child { margin-bottom: 0; }
-  .sec p.lede-cap::first-letter {
-    font-size: 2.6em;
-    font-weight: 700;
-    float: left;
-    line-height: .85;
-    margin: 3px 6px 0 0;
-    color: var(--accent);
-  }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--bg); }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-serif);
+      font-size: 17px;
+      line-height: 1.72;
+      transition: background .2s ease, color .2s ease;
+    }
+    a { color: var(--accent); text-underline-offset: 3px; }
+    a:hover { text-decoration-thickness: 2px; }
+    code { font-family: var(--font-mono); }
 
-  .placeholder-note {
-    font-family: var(--font-mono);
-    font-size: 10.5px;
-    line-height: 1.55;
-    color: var(--text-dim);
-    background: var(--surface-2);
-    border-left: 2px solid var(--accent);
-    padding: 8px 12px;
-    margin: 0 0 20px;
-  }
+    .shell { width: min(100% - 40px, 660px); margin: 0 auto; }
+    .masthead { padding: 100px 0 76px; border-bottom: 1px solid var(--border); }
+    .eyebrow,
+    .byline,
+    .status-note,
+    .sec-num,
+    .sub-num,
+    .code-label,
+    .chart-caption,
+    .footer-note,
+    .toc,
+    th {
+      font-family: var(--font-mono);
+      letter-spacing: var(--label-spacing);
+    }
+    .eyebrow {
+      margin: 0 0 5px;
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .byline { margin: 0; color: var(--text-dim); font-size: 10px; text-transform: uppercase; }
+    .byline-name { margin: 4px 0 42px; font-size: 15px; font-weight: 600; }
+    .wordmark {
+      margin: 0 0 20px;
+      font-family: var(--font-mono);
+      font-size: clamp(38px, 8vw, 58px);
+      font-weight: 700;
+      letter-spacing: -.055em;
+      line-height: 1;
+    }
+    .wordmark .data { color: var(--accent); }
+    .dek { max-width: 590px; margin: 0; font-size: 25px; line-height: 1.35; color: var(--text); }
+    .status-note { margin: 28px 0 0; color: var(--text-dim); font-size: 10px; text-transform: uppercase; }
 
-  footer {
-    text-align: center;
-    margin-top: 40px;
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-dim);
-    line-height: 1.7;
-  }
-  .theme-toggle {
-    position: relative;
-    margin-top: 16px;
-    width: 42px; height: 24px;
-    border-radius: 999px;
-    background: var(--border);
-    border: none;
-    cursor: pointer;
-  }
-  .theme-toggle .knob {
-    position: absolute;
-    top: 3px; left: 3px;
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: var(--bg);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    transition: transform .25s ease;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text);
-  }
-  .theme-toggle .knob svg { width: 11px; height: 11px; display: block; }
-  [data-theme="dark"] .theme-toggle .knob { transform: translateX(18px); }
+    .sec { padding: 70px 0 76px; border-bottom: 1px solid var(--border); scroll-margin-top: 24px; }
+    .sec:last-of-type { border-bottom: 0; }
+    .sec-num { margin: 0 0 3px; color: var(--accent); font-size: 12px; font-weight: 700; }
+    h2 { margin: 0 0 30px; font-size: clamp(31px, 7vw, 42px); line-height: 1.08; letter-spacing: -.025em; }
+    h3 { margin: 0 0 17px; font-size: 25px; line-height: 1.2; }
+    p { margin: 0 0 22px; }
+    p:last-child { margin-bottom: 0; }
+    .lede-cap::first-letter { float: left; margin: 7px 8px 0 0; color: var(--accent); font-size: 62px; line-height: .75; font-weight: 600; }
+    strong { color: var(--text); }
+    .sub-num { margin: 38px 0 2px; color: var(--accent); font-size: 11px; font-weight: 700; }
+    .subdivider { margin: 40px 0 34px; border: 0; border-top: 1px solid var(--border); }
 
-  @media (max-width: 560px) {
-    .wordmark { font-size: 28px; }
-  }
-</style>
+    .callout {
+      margin: 30px 0;
+      padding: 16px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.65;
+    }
+
+    .code-label { margin: 32px 0 9px; color: var(--accent); font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .code-panel,
+    .plain-panel {
+      margin: 0 0 26px;
+      padding: 22px 24px;
+      overflow-x: auto;
+      background: var(--code-bg);
+      border: 1px solid #292a2d;
+      border-radius: 9px;
+      color: #e8e8e8;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+    .code-panel code { padding: 0; background: transparent; }
+    :not(pre) > code {
+      padding: 2px 6px;
+      background: var(--surface-2);
+      border-radius: 4px;
+      font-size: .78em;
+    }
+
+    .diagram-wrap,
+    .chart-wrap {
+      margin: 30px 0 16px;
+      padding: 22px;
+      overflow-x: auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .diagram-wrap svg { display: block; min-width: 590px; }
+    .diagram-box { fill: var(--bg); stroke: var(--border); stroke-width: 1.2; }
+    .diagram-accent { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.2; }
+    .diagram-line { stroke: var(--text-dim); stroke-width: 1.2; fill: none; }
+    .diagram-arrowhead { fill: var(--text-dim); }
+    .diagram-label { fill: var(--text); font: 600 11px var(--font-mono); }
+    .diagram-copy { fill: var(--text-dim); font: 400 9px var(--font-mono); }
+    .diagram-step { fill: var(--accent); font: 700 9px var(--font-mono); letter-spacing: .08em; }
+    .chart-wrap { height: 300px; }
+    .chart-caption { margin: 10px 0 28px; color: var(--text-dim); font-size: 10px; line-height: 1.55; text-align: center; }
+
+    .process-img {
+      display: block;
+      width: 100%;
+      margin: 16px auto 0;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      box-shadow: 0 16px 42px rgba(0,0,0,.12);
+    }
+    [data-theme="dark"] .process-img { opacity: .93; }
+    .screenshot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 24px 0 12px; }
+    .screenshot-grid figure { margin: 0; }
+    .screenshot-grid img { width: 100%; height: 360px; object-fit: cover; object-position: top; border: 1px solid var(--border); border-radius: 8px; }
+    .screenshot-grid figcaption { margin-top: 8px; color: var(--text-dim); font: 9px/1.45 var(--font-mono); text-align: center; }
+
+    table { width: 100%; margin: 24px 0 30px; border-collapse: collapse; }
+    th { padding: 9px 10px; border-bottom: 2px solid var(--text); color: var(--accent); font-size: 9px; text-align: left; text-transform: uppercase; }
+    td { padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: top; font-size: 14px; line-height: 1.55; }
+    td:first-child { font-weight: 600; }
+    .timeline td:first-child { width: 90px; color: var(--accent); font-family: var(--font-mono); font-size: 11px; }
+    .skills-table td:nth-child(1) { width: 25%; }
+    .skills-table td:nth-child(2) { width: 28%; color: var(--text-dim); }
+
+    .ref-stack { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 30px; }
+    .ref-link {
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .ref-link:hover { text-decoration: underline; }
+    .cite-ref { margin-left: 3px; font: 700 9px var(--font-mono); text-decoration: none; vertical-align: super; }
+    .citation { padding-left: 34px; position: relative; color: var(--text-dim); font-size: 14px; }
+    .cite-num { position: absolute; left: 0; color: var(--accent); font: 700 10px var(--font-mono); }
+    .ai-note { color: var(--text-dim); font-style: italic; font-size: 14px; }
+    .built-with { color: var(--text-dim); }
+
+    footer { padding: 44px 0 80px; color: var(--text-dim); font-family: var(--font-mono); font-size: 10px; line-height: 1.8; }
+    .theme-toggle {
+      width: 44px;
+      height: 25px;
+      margin-top: 17px;
+      padding: 0;
+      position: relative;
+      background: var(--border);
+      border: 0;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .theme-toggle .knob {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 19px;
+      height: 19px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--bg);
+      color: var(--text);
+      transition: transform .2s ease;
+    }
+    .theme-toggle svg { width: 11px; height: 11px; }
+    [data-theme="dark"] .theme-toggle .knob { transform: translateX(19px); }
+
+    .toc {
+      position: fixed;
+      top: 50%;
+      left: calc(50% + 380px);
+      width: 195px;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 9px;
+      line-height: 1.3;
+    }
+    .toc a { padding: 6px 0 6px 12px; border-left: 1px solid var(--border); color: var(--text-dim); text-decoration: none; }
+    .toc a:hover,
+    .toc a.active { border-color: var(--accent); color: var(--accent); }
+
+    @media (max-width: 1180px) { .toc { display: none; } }
+    @media (max-width: 720px) {
+      body { font-size: 16px; }
+      .shell { width: min(100% - 32px, 660px); }
+      .masthead { padding: 72px 0 58px; }
+      .sec { padding: 56px 0 62px; }
+      .screenshot-grid { grid-template-columns: 1fr; }
+      .screenshot-grid img { height: auto; max-height: 680px; object-fit: contain; background: #0c0c0d; }
+      .diagram-wrap { padding: 16px; }
+      .code-panel,
+      .plain-panel { padding: 18px; font-size: 11px; }
+    }
+    @media (max-width: 560px) {
+      .dek { font-size: 21px; }
+      table:not(.skills-table) { display: block; overflow-x: auto; }
+      .skills-table,
+      .skills-table tbody,
+      .skills-table tr,
+      .skills-table td { display: block; width: 100% !important; }
+      .skills-table thead { display: none; }
+      .skills-table tr { padding: 16px 0; border-bottom: 1px solid var(--border); }
+      .skills-table td { padding: 4px 0; border: 0; }
+      .skills-table td::before { display: block; margin-bottom: 2px; color: var(--accent); font: 700 8px var(--font-mono); letter-spacing: var(--label-spacing); text-transform: uppercase; }
+      .skills-table td:nth-child(1)::before { content: "Skill"; }
+      .skills-table td:nth-child(2)::before { content: "Tools used"; }
+      .skills-table td:nth-child(3)::before { content: "How it was applied"; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+  </style>
 </head>
 <body>
 
-<div class="shell">
+<nav class="toc" aria-label="Table of contents">
+  <a href="#problem">01 The Problem</a>
+  <a href="#design">02 Designing the Build</a>
+  <a href="#architecture">03 System Architecture</a>
+  <a href="#signals">04 Inputs to Signals</a>
+  <a href="#formula">05 The Formula</a>
+  <a href="#sprints">06 Eight Sprints</a>
+  <a href="#problems">07 Problems Encountered</a>
+  <a href="#prompts">08 Prompts and Review</a>
+  <a href="#security">09 Privacy and Security</a>
+  <a href="#demo">10 The Working Demo</a>
+  <a href="#next">11 Where This Goes Next</a>
+  <a href="#built">12 Built With</a>
+  <a href="#skills">13 Skills Exercised</a>
+  <a href="#sources">14 Sources and Citations</a>
+</nav>
 
-  <div class="masthead">
-    <p class="eyebrow">Data Science Senior Project</p>
-    <p class="byline">Brigham Young University&nbsp;-&nbsp;Idaho</p>
+<main class="shell">
+  <header class="masthead">
+    <p class="eyebrow">Product and Engineering Case Study</p>
+    <p class="byline">Built in public across eight planned sprints</p>
     <p class="byline-name">Jonathan Ascona</p>
-    <div class="wordmark-row">
-      <img src="mark-small.png" alt="BodyByData bar chart mark">
-      <div class="wordmark">Body<span>By</span><span class="mark">Data</span></div>
-    </div>
-    <p class="dek">How BodyByData actually got built: the brand, the design decisions, and the app that grew out of Triad.</p>
-    <p class="status-note">In progress, growing alongside the real build</p>
-  </div>
+    <div class="wordmark">BodyBy<span class="data">Data</span></div>
+    <p class="dek">A transparent personal health analytics demo, built to turn fragmented sleep, training, and nutrition data into one inspectable daily picture.</p>
+    <p class="status-note">Working public demo · React and FastAPI · every score explains its inputs</p>
+  </header>
 
-  <section class="sec" id="idea">
+  <section class="sec" id="problem">
     <p class="sec-num">01</p>
-    <h2>The Idea</h2>
-    <p class="lede-cap">Triad was never meant to be the end of the project. It was scoped from the start as the data foundation for something bigger: a personal fitness intelligence app that could unify sleep, nutrition, and training into one daily answer, packaged for people who are not going to write their own Python pipeline to get it. The research question behind Triad, whether sleep quality and prior training load can predict what a day's workout and calorie target should be, was always meant to power a real, day-to-day product once it was validated.</p>
-    <p class="placeholder-note">This section will grow as the actual BodyByData build progresses in its own project. Next real content needed here: the specific moment the idea crossed from "package" to "app I want other people to use," and what changed in the plan once that decision was made.</p>
+    <h2>The Problem</h2>
+    <p class="lede-cap">Health data is easy to collect and hard to use. Sleep lives in one app, training in another, and nutrition somewhere else. The products that summarize it often return a single score without showing how the number was made. BodyByData was built around the opposite promise: normalize the sources, calculate the signals in a separate intelligence layer, and expose every component, input, weight, and confidence value to the person reading the result.</p>
+    <p>The original demo targeted people who already track. Its next product question is broader: what should happen when the user has no watch, no connected app, and no history at all? That question becomes the post-demo expansion described later in this page.</p>
+  </section>
+
+  <section class="sec" id="design">
+    <p class="sec-num">02</p>
+    <h2>Designing the Build</h2>
+    <p>BodyByData did not begin as a pile of routes and components. The project plan settled the architecture, deployment, review workflow, privacy constraints, and eight-sprint sequence before the application repository existed.</p>
+
+    <p class="code-label">The boundary written before the build</p>
+    <pre class="plain-panel">ingest/  normalizes source data, no analytics
+core/    calculates readiness, confidence, goals, no I/O
+models/  persists normalized values with provenance
+api/     joins persistence and pure calculations
+frontend displays the result and the reasoning</pre>
+
+    <p>That separation mattered when the first seed implementation placed confidence calculations inside ingestion. Sprint 2 exposed the violation through a duplicate-writer failure. Confidence moved into the recompute service, and ingestion returned to being source normalization only.</p>
+
+    <p class="code-label">Real finished artifacts</p>
+    <div class="screenshot-grid">
+      <figure>
+        <img src="assets/landing.png" alt="BodyByData demo landing page">
+        <figcaption>Demo entry with a guest session and honest storage copy</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/home.png" alt="BodyByData Home page with readiness and coaching">
+        <figcaption>Readiness, confidence, and deterministic coaching</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/dashboard.png" alt="BodyByData Dashboard training-load view">
+        <figcaption>Training load and the wider analytics surface</figcaption>
+      </figure>
+    </div>
+
+    <div class="callout">The repository contains no original BodyByData notebook photographs yet. This page uses shipped screenshots and real planning documents rather than recreating sketches and presenting them as originals.</div>
+  </section>
+
+  <section class="sec" id="architecture">
+    <p class="sec-num">03</p>
+    <h2>System Architecture</h2>
+    <div class="diagram-wrap" role="img" aria-label="BodyByData system architecture from sources through the web interface">
+      <svg viewBox="0 0 660 205" xmlns="http://www.w3.org/2000/svg" width="100%">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" class="diagram-arrowhead"/>
+          </marker>
+        </defs>
+        <text x="12" y="16" class="diagram-step">01 SOURCES</text>
+        <rect x="12" y="27" width="126" height="56" rx="6" class="diagram-box"/>
+        <text x="75" y="51" text-anchor="middle" class="diagram-label">Apple · Hevy</text>
+        <text x="75" y="68" text-anchor="middle" class="diagram-copy">Cal AI · demo seed</text>
+
+        <line x1="138" y1="55" x2="170" y2="55" class="diagram-line" marker-end="url(#arrow)"/>
+        <text x="175" y="16" class="diagram-step">02 INGEST</text>
+        <rect x="175" y="27" width="126" height="56" rx="6" class="diagram-box"/>
+        <text x="238" y="51" text-anchor="middle" class="diagram-label">Adapters</text>
+        <text x="238" y="68" text-anchor="middle" class="diagram-copy">validate · normalize</text>
+
+        <line x1="301" y1="55" x2="333" y2="55" class="diagram-line" marker-end="url(#arrow)"/>
+        <text x="338" y="16" class="diagram-step">03 STORE</text>
+        <rect x="338" y="27" width="126" height="56" rx="6" class="diagram-accent"/>
+        <text x="401" y="51" text-anchor="middle" class="diagram-label">daily_summary</text>
+        <text x="401" y="68" text-anchor="middle" class="diagram-copy">Postgres · provenance</text>
+
+        <line x1="464" y1="55" x2="496" y2="55" class="diagram-line" marker-end="url(#arrow)"/>
+        <text x="501" y="16" class="diagram-step">04 CORE</text>
+        <rect x="501" y="27" width="147" height="56" rx="6" class="diagram-box"/>
+        <text x="574" y="51" text-anchor="middle" class="diagram-label">Pure intelligence</text>
+        <text x="574" y="68" text-anchor="middle" class="diagram-copy">score · confidence · goals</text>
+
+        <line x1="574" y1="83" x2="574" y2="119" class="diagram-line" marker-end="url(#arrow)"/>
+        <rect x="393" y="125" width="255" height="58" rx="6" class="diagram-box"/>
+        <text x="520" y="149" text-anchor="middle" class="diagram-label">FastAPI · typed React interface</text>
+        <text x="520" y="167" text-anchor="middle" class="diagram-copy">inputs, components, confidence, actions</text>
+
+        <line x1="393" y1="154" x2="336" y2="154" class="diagram-line" marker-end="url(#arrow)"/>
+        <rect x="12" y="125" width="324" height="58" rx="6" class="diagram-box"/>
+        <text x="174" y="149" text-anchor="middle" class="diagram-label">Lifecycle and security contracts</text>
+        <text x="174" y="167" text-anchor="middle" class="diagram-copy">export · cascade delete · TTL · rate limits</text>
+      </svg>
+    </div>
+    <p>The normalized daily hub is the architectural center. Source adapters can change without rewriting scoring. Intelligence can change without learning file formats. The interface can show the calculation because the API returns the same breakdown the core function created.</p>
+  </section>
+
+  <section class="sec" id="signals">
+    <p class="sec-num">04</p>
+    <h2>From Inputs to Signals</h2>
+    <p>The readiness layer reads five components. Each component carries a raw explanation, normalized value, weight, contribution, and a separate confidence result based on recent data density.</p>
+    <table>
+      <thead><tr><th>Component</th><th>Source signal</th><th>Confidence window</th></tr></thead>
+      <tbody>
+        <tr><td>Sleep quality</td><td>Source sleep score, with duration as fallback</td><td>7 days</td></tr>
+        <tr><td>HRV balance</td><td>Today compared with a 7-day SDNN baseline</td><td>7 days</td></tr>
+        <tr><td>Resting heart rate</td><td>Today compared with a 7-day baseline</td><td>7 days</td></tr>
+        <tr><td>Training-load balance</td><td>ATL divided by CTL, using 7-day and 42-day EWMAs</td><td>42 days</td></tr>
+        <tr><td>Nutrition adherence</td><td>Calories and protein compared with visible targets</td><td>7 days</td></tr>
+      </tbody>
+    </table>
+
+    <p class="code-label">Confidence is density, not belief</p>
+    <pre class="code-panel"><code class="language-python">confidence = min(1.0, days_of_data / window_days)
+
+{
+    "component": "hrv_balance",
+    "confidence": round(confidence, 3),
+    "days_of_data": days_of_data,
+    "window_days": 7,
+}</code></pre>
+    <p>A sparse component is not hidden and is not described with false certainty. The interface can say both what the score used and how much history supports it.</p>
+  </section>
+
+  <section class="sec" id="formula">
+    <p class="sec-num">05</p>
+    <h2>The Readiness Formula</h2>
+    <p>The score is a weighted sum of normalized components. Missing inputs take a neutral path with an explicit explanation rather than becoming zero adherence.</p>
+
+    <p class="code-label">Current production weights</p>
+    <pre class="code-panel"><code class="language-python">WEIGHTS = {
+    "sleep_quality": 0.30,
+    "hrv_balance": 0.25,
+    "resting_hr": 0.15,
+    "training_load_balance": 0.20,
+    "nutrition_adherence": 0.10,
+}
+
+score = round(sum(component["contribution"] for component in breakdown))</code></pre>
+
+    <div class="chart-wrap"><canvas id="weightChart" aria-label="Readiness component weights" role="img"></canvas></div>
+    <p class="chart-caption">The same five weights returned by the public methodology endpoint</p>
+
+    <table>
+      <thead><tr><th>Score</th><th>Band</th><th>Interface meaning</th></tr></thead>
+      <tbody>
+        <tr><td>85 to 100</td><td>Train Hard</td><td>The strongest readiness band</td></tr>
+        <tr><td>70 to 84</td><td>Train Normal</td><td>Normal planned work</td></tr>
+        <tr><td>50 to 69</td><td>Train Easy</td><td>Reduce intensity or volume</td></tr>
+        <tr><td>30 to 49</td><td>Active Recovery</td><td>Bias toward light movement</td></tr>
+        <tr><td>0 to 29</td><td>Rest Day</td><td>Protect recovery</td></tr>
+      </tbody>
+    </table>
+
+    <p>Coaching remains deterministic. Each rule cites the exact values that fired it. A suggestion can point to HRV against baseline and negative TSB rather than asking the user to trust generic advice.</p>
+  </section>
+
+  <section class="sec" id="sprints">
+    <p class="sec-num">06</p>
+    <h2>Eight Sprints</h2>
+    <p>The project was ordered as a walking skeleton first, then a deliberate thickening of data, intelligence, interface, integrations, and trust.</p>
+    <table class="timeline">
+      <thead><tr><th>Sprint</th><th>What became true</th></tr></thead>
+      <tbody>
+        <tr><td>00</td><td>One repository, CI, Render deployment, live frontend-to-API path, review workflow</td></tr>
+        <tr><td>01</td><td>Models, migrations, auth, lifecycle, and 90-day deterministic demo data</td></tr>
+        <tr><td>02</td><td>Readiness, ATL, CTL, TSB, confidence, goals, recomputation, golden tests</td></tr>
+        <tr><td>03</td><td>Design system, typed client, Home, Dashboard, and real charts</td></tr>
+        <tr><td>04</td><td>Data, Goals, provider cards, export, deletion, settings, onboarding</td></tr>
+        <tr><td>05</td><td>Apple Health XML upload and normalized ingestion with temporary-file deletion</td></tr>
+        <tr><td>06</td><td>Hevy sync and Cal AI PDF review-before-commit flow</td></tr>
+        <tr><td>07</td><td>Hardening, privacy verification, coaching, screenshots, audits, launch script</td></tr>
+        <tr><td>08</td><td>Body-composition ranges, manual entry, goals, uncertainty, provider-ready boundary</td></tr>
+      </tbody>
+    </table>
+    <p>Sprint 8 was post-launch in the original roadmap, but it is included here because it completed before this case study was assembled.</p>
+  </section>
+
+  <section class="sec" id="problems">
+    <p class="sec-num">07</p>
+    <h2>Problems Encountered</h2>
+
+    <p class="sub-num">7.1</p>
+    <h3>Equivalent local checks were not equivalent</h3>
+    <p>The first CI run could not import the backend. Local verification used <code>python -m pytest</code>, while CI used <code>pytest</code>. The project fixed Python-path configuration and adopted a stricter rule: run the exact CI invocation before push.</p>
+
+    <p class="sub-num">7.2</p>
+    <h3>The gauge fix was wrong twice</h3>
+    <p>A crowded decimal on the training-load gauge was first treated as precision, then spacing. The actual overlap came from a decorative pivot dot. Removing it fixed the visual problem without changing the number. The failed diagnoses remain in the logs.</p>
+
+    <p class="sub-num">7.3</p>
+    <h3>The API was healthy and the browser still failed</h3>
+    <p>The custom domain's demo login returned a successful API response, but Safari showed a network error. The missing CORS header was the failure. Canonical production origins moved into backend configuration and were unioned with environment values.</p>
+
+    <p class="code-label">Production CORS repair</p>
+    <pre class="code-panel"><code class="language-python">for origin in (*CANONICAL_PRODUCTION_ORIGINS, *configured):
+    if origin not in seen:
+        seen.add(origin)
+        origins.append(origin)</code></pre>
+
+    <p class="sub-num">7.4</p>
+    <h3>Not every planned integration became live</h3>
+    <p>Sprint 8 created a photo-estimation provider boundary but did not receive authority or account setup for a live external provider. The interface does not upload image bytes to a disabled endpoint. Manual ranges and uncertainty bands keep the demo truthful while the external dependency remains deferred.</p>
+  </section>
+
+  <section class="sec" id="prompts">
+    <p class="sec-num">08</p>
+    <h2>Prompt Engineering and Review</h2>
+    <p>Prompts functioned as executable project briefs. Each one carried scope, architecture rules, acceptance criteria, verification commands, documentation duties, and a stopping condition.</p>
+
+    <div class="diagram-wrap" role="img" aria-label="AI-assisted engineering review loop">
+      <svg viewBox="0 0 660 120" xmlns="http://www.w3.org/2000/svg" width="100%">
+        <defs>
+          <marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" class="diagram-arrowhead"/>
+          </marker>
+        </defs>
+        <rect x="4" y="32" width="112" height="52" rx="6" class="diagram-box"/>
+        <text x="60" y="55" text-anchor="middle" class="diagram-label">Sprint prompt</text>
+        <text x="60" y="70" text-anchor="middle" class="diagram-copy">scope · invariants</text>
+        <line x1="116" y1="58" x2="138" y2="58" class="diagram-line" marker-end="url(#arrow2)"/>
+        <rect x="142" y="32" width="112" height="52" rx="6" class="diagram-box"/>
+        <text x="198" y="55" text-anchor="middle" class="diagram-label">Build agent</text>
+        <text x="198" y="70" text-anchor="middle" class="diagram-copy">code · local checks</text>
+        <line x1="254" y1="58" x2="276" y2="58" class="diagram-line" marker-end="url(#arrow2)"/>
+        <rect x="280" y="32" width="112" height="52" rx="6" class="diagram-accent"/>
+        <text x="336" y="55" text-anchor="middle" class="diagram-label">PR and CI</text>
+        <text x="336" y="70" text-anchor="middle" class="diagram-copy">tests · audits</text>
+        <line x1="392" y1="58" x2="414" y2="58" class="diagram-line" marker-end="url(#arrow2)"/>
+        <rect x="418" y="32" width="112" height="52" rx="6" class="diagram-box"/>
+        <text x="474" y="55" text-anchor="middle" class="diagram-label">CodeRabbit</text>
+        <text x="474" y="70" text-anchor="middle" class="diagram-copy">findings · re-review</text>
+        <line x1="530" y1="58" x2="552" y2="58" class="diagram-line" marker-end="url(#arrow2)"/>
+        <rect x="556" y="32" width="100" height="52" rx="6" class="diagram-box"/>
+        <text x="606" y="55" text-anchor="middle" class="diagram-label">Merge</text>
+        <text x="606" y="70" text-anchor="middle" class="diagram-copy">deploy · verify</text>
+      </svg>
+    </div>
+
+    <p>Early workflows stopped after pushing a commit, leaving the owner to move CodeRabbit findings between tools. Later prompts assigned the agent the full loop through re-review and merge. Better ownership came from a better process definition, not only a different model.</p>
+
+    <p>The three living logs made review observable:</p>
+    <table>
+      <thead><tr><th>Log</th><th>What it preserved</th></tr></thead>
+      <tbody>
+        <tr><td>PROMPT_LOG</td><td>Scope changes, failures, prompt corrections, and deviations</td></tr>
+        <tr><td>SECURITY_LOG</td><td>Threat surface, findings, fixes, audits, and accepted risk</td></tr>
+        <tr><td>CODERABBIT_LOG</td><td>Every automated review finding and its disposition</td></tr>
+      </tbody>
+    </table>
+
+    <div class="ref-stack">
+      <a class="ref-link" href="https://github.com/jonathanascona/BodyByData_main/blob/main/docs/logs/PROMPT_LOG.md" target="_blank" rel="noopener"><span aria-hidden="true">&#8594;</span> Read the prompt log</a>
+      <a class="ref-link" href="https://github.com/jonathanascona/BodyByData_main/blob/main/docs/STATUS.md" target="_blank" rel="noopener"><span aria-hidden="true">&#8594;</span> Read the development status</a>
+      <a class="ref-link" href="https://github.com/jonathanascona/BodyByData_main/tree/main/docs/logs" target="_blank" rel="noopener"><span aria-hidden="true">&#8594;</span> Inspect the source logs</a>
+    </div>
+  </section>
+
+  <section class="sec" id="security">
+    <p class="sec-num">09</p>
+    <h2>Privacy and Security</h2>
+    <p>Privacy claims were treated as testable behavior. Uploaded Apple Health and Cal AI files use temporary storage and are deleted on success and failure. Demo guests expire after seven days. User-owned tables cascade on account deletion. Hevy keys are encrypted at rest. Account export enumerates the same model metadata used by lifecycle tests.</p>
+
+    <table>
+      <thead><tr><th>Contract</th><th>How it was enforced</th></tr></thead>
+      <tbody>
+        <tr><td>No raw uploads retained</td><td>Success and rejection tests prove temporary files are removed</td></tr>
+        <tr><td>Real deletion</td><td>Foreign-key cascade meta-tests cover every user-owned table</td></tr>
+        <tr><td>Guest expiration</td><td>Seven-day TTL plus scheduled lifecycle sweep</td></tr>
+        <tr><td>Bounded requests</td><td>Body-size middleware and endpoint-specific validation</td></tr>
+        <tr><td>Abuse resistance</td><td>Rate limits on auth, seed, recompute, and destructive routes</td></tr>
+        <tr><td>Dependency review</td><td>Python and production npm audits during hardening</td></tr>
+      </tbody>
+    </table>
+    <p>At Sprint 7 closeout, the repository recorded 255 passing backend tests, a clean Python lint pass, a green frontend production build, clean declared Python dependencies, and zero production npm vulnerabilities. Sprint 8 added more functionality afterward, so this number is presented as a dated milestone rather than a current total.</p>
+  </section>
+
+  <section class="sec" id="demo">
+    <p class="sec-num">10</p>
+    <h2>The Working Demo</h2>
+    <p>A stranger can create a guest session with 90 days of deterministic data. The last two weeks tell a deliberate story: hard training suppresses HRV and pushes training balance negative, then a recovery week raises HRV and readiness.</p>
+
+    <p class="code-label">Two-minute path</p>
+    <pre class="plain-panel">Landing
+  create guest and seed the story
+
+Home
+  inspect readiness components and cited coaching
+
+Dashboard
+  follow fatigue, fitness, sleep, nutrition, and strength
+
+Data
+  inspect sources, export, and deletion
+
+Settings
+  reset the deterministic guest story</pre>
+
+    <div class="ref-stack">
+      <a class="ref-link" href="https://bodybydata.com" target="_blank" rel="noopener"><span aria-hidden="true">&#8594;</span> Open the live demo</a>
+      <a class="ref-link" href="https://github.com/jonathanascona/BodyByData_main" target="_blank" rel="noopener"><span aria-hidden="true">&#8594;</span> Read the application source</a>
+    </div>
+  </section>
+
+  <section class="sec" id="next">
+    <p class="sec-num">11</p>
+    <h2>Where This Goes Next</h2>
+    <p>The finished demo serves people who already collect data. The next product expansion serves the person who is just beginning.</p>
+
+    <p><strong>Simple Start</strong> introduces a two-minute baseline and a 20 to 30-second Daily Pulse. A user can begin with sleep quality, energy, and whether they trained. BodyByData returns a separately labeled Starter Estimate, shows the self-reported inputs, and explains how much history supports the result.</p>
+
+    <p>The starter model does not silently merge with connected readiness. When connected history becomes sufficient, the interface explains the model change and preserves earlier history under its original label.</p>
+
+    <div class="callout">Simple Start is a planned post-demo sprint. It is not live in the current application and is not presented as shipped functionality.</div>
+
+  </section>
+
+  <section class="sec" id="built">
+    <p class="sec-num">12</p>
+    <h2>Built With</h2>
+    <p class="built-with">React, TypeScript, Vite, Chart.js, FastAPI, Python, SQLAlchemy, Alembic, Postgres, SQLite for tests and local work, PyJWT, cryptography, pdfplumber, Open Wearables code adapted under MIT, pytest, ruff, GitHub Actions, CodeRabbit, Render, and optional Sentry integration.</p>
+  </section>
+
+  <section class="sec" id="skills">
+    <p class="sec-num">13</p>
+    <h2>Skills Exercised</h2>
+    <table class="skills-table">
+      <thead><tr><th>Skill</th><th>Tools used</th><th>How it was applied</th></tr></thead>
+      <tbody>
+        <tr><td>Product management</td><td>Sprint plans, acceptance criteria, living handoffs</td><td>Sequenced a walking skeleton into eight bounded sprints with explicit non-goals and completion tests</td></tr>
+        <tr><td>Data architecture</td><td>SQLAlchemy, Postgres, Alembic</td><td>Designed normalized source tables around a daily hub with provenance and cascade lifecycle rules</td></tr>
+        <tr><td>Applied analytics</td><td>Python</td><td>Implemented readiness components, ATL, CTL, TSB, confidence density, goals, and deterministic coaching</td></tr>
+        <tr><td>API engineering</td><td>FastAPI, typed schemas, JWT</td><td>Built auth, lifecycle, imports, summaries, goals, methodology, and demo endpoints</td></tr>
+        <tr><td>Frontend engineering</td><td>React, TypeScript, Chart.js</td><td>Built a responsive four-page product with typed data, charts, forms, confidence, and failure states</td></tr>
+        <tr><td>Security and privacy</td><td>Middleware, encryption, audits, regression tests</td><td>Verified upload deletion, cascade deletion, rate limits, body caps, token behavior, and dependency health</td></tr>
+        <tr><td>Prompt engineering</td><td>Claude, Cursor, structured sprint prompts</td><td>Used prompts as scoped project briefs with invariants, review ownership, evidence requirements, and stopping conditions</td></tr>
+        <tr><td>Review operations</td><td>GitHub Actions, CodeRabbit, living logs</td><td>Tracked findings through fix, rebuttal, re-review, merge, deployment, and live verification</td></tr>
+        <tr><td>Visual design</td><td>Design tokens, responsive CSS</td><td>Carried a consistent dark product system into cards, charts, mobile navigation, disclosures, and data-heavy layouts</td></tr>
+        <tr><td>Technical communication</td><td>Markdown, HTML, diagrams, screenshots</td><td>Maintained implementation logs and built this evidence-based public case study</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="sec" id="sources">
+    <p class="sec-num">14</p>
+    <h2>Sources and Citations</h2>
+    <p class="ai-note">The writing and layout of this showcase page were produced with AI-assisted editing under the project owner's direction; the application claims are grounded in the repository artifacts linked below.</p>
+    <p>Internal engineering claims trace to the application source, tests, history, and living logs. Outside code and research are credited separately.</p>
+
+    <p class="code-label">Project evidence</p>
+    <p class="citation" id="cite-1"><span class="cite-num">[1]</span><a href="https://github.com/jonathanascona/BodyByData_main" target="_blank" rel="noopener">BodyByData_main</a>. Application source, tests, project plan, sprint prompts, status history, security log, prompt log, and CodeRabbit log.</p>
+    <p class="citation" id="cite-2"><span class="cite-num">[2]</span><a href="https://github.com/jonathanascona/triad-showcase" target="_blank" rel="noopener">Triad Showcase</a>. The design and editorial reference for this public engineering paper.</p>
+
+    <p class="code-label">Outside code and research</p>
+    <p class="citation" id="cite-3"><span class="cite-num">[3]</span><a href="https://github.com/the-momentum/open-wearables" target="_blank" rel="noopener">The Momentum, Open Wearables</a>. MIT-licensed Apple Health parsing, model patterns, and seed-generation code adapted and attributed in the application repository.</p>
+    <p class="citation" id="cite-4"><span class="cite-num">[4]</span>Ferreira TJ, Salvador IC, Pessanha CR, et al. <a href="https://www.nature.com/articles/s41746-024-01380-6">"Advances in the estimation of body fat percentage using an artificial intelligence 2D-photo method."</a> <em>npj Digital Medicine</em> 8, 43 (2025). Referenced by the project's body-composition roadmap when defining estimate ranges and uncertainty.</p>
+
+    <p class="code-label">Page production</p>
+    <p>Source Serif 4 and JetBrains Mono through Google Fonts, Chart.js for the weight chart, highlight.js for code syntax, inline SVG for architecture and process diagrams, GitHub for source control, and GitHub Pages as the intended static host.</p>
   </section>
 
   <footer>
-    Jonathan Ascona &middot; dba BodyByData &middot; &copy; 2026. All rights reserved.
+    Jonathan Ascona · BodyByData · 2026
     <br>
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-      <span class="knob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><line x1="12" y1="2.5" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="21.5"/><line x1="4.2" y1="4.2" x2="6" y2="6"/><line x1="18" y1="18" x2="19.8" y2="19.8"/><line x1="2.5" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21.5" y2="12"/><line x1="4.2" y1="19.8" x2="6" y2="18"/><line x1="18" y1="6" x2="19.8" y2="4.2"/></svg></span>
+    <span class="footer-note">A public engineering case study for a working demo.</span>
+    <br>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
+      <span class="knob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span>
     </button>
   </footer>
-</div>
+</main>
 
 <script>
-  const toggle = document.getElementById('themeToggle');
-  const root = document.documentElement;
-  toggle.addEventListener('click', () => {
-    root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-  });
-</script>
+  if (window.hljs) window.hljs.highlightAll();
 
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  let weightChart;
+
+  function renderWeightChart() {
+    if (!window.Chart) return;
+    const styles = getComputedStyle(root);
+    const text = styles.getPropertyValue('--text').trim();
+    const dim = styles.getPropertyValue('--text-dim').trim();
+    const accent = styles.getPropertyValue('--accent').trim();
+    const border = styles.getPropertyValue('--border').trim();
+    const context = document.getElementById('weightChart');
+
+    if (weightChart) weightChart.destroy();
+    weightChart = new Chart(context, {
+      type: 'bar',
+      data: {
+        labels: ['Sleep', 'HRV', 'Resting HR', 'Training load', 'Nutrition'],
+        datasets: [{
+          data: [30, 25, 15, 20, 10],
+          backgroundColor: [accent, accent, accent, accent, accent],
+          borderRadius: 4,
+          barThickness: 25
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: {
+            beginAtZero: true,
+            max: 35,
+            grid: { color: border },
+            ticks: { color: dim, callback: (value) => value + '%', font: { family: 'JetBrains Mono', size: 10 } },
+            title: { display: true, text: 'weight in readiness score', color: dim, font: { family: 'JetBrains Mono', size: 10 } }
+          },
+          y: { grid: { display: false }, ticks: { color: text, font: { family: 'JetBrains Mono', size: 10 } } }
+        }
+      }
+    });
+  }
+
+  themeToggle.addEventListener('click', () => {
+    root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    renderWeightChart();
+  });
+  renderWeightChart();
+
+  const tocLinks = document.querySelectorAll('.toc a');
+  const sections = document.querySelectorAll('section.sec[id]');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      tocLinks.forEach((link) => link.classList.remove('active'));
+      const active = document.querySelector('.toc a[href="#' + entry.target.id + '"]');
+      if (active) active.classList.add('active');
+    });
+  }, { rootMargin: '-15% 0px -70% 0px' });
+  sections.forEach((section) => observer.observe(section));
+</script>
 </body>
 </html>
