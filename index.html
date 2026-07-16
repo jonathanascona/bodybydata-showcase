@@ -81,15 +81,20 @@
     }
     .byline { margin: 0; color: var(--text-dim); font-size: 10px; text-transform: uppercase; }
     .byline-name { margin: 4px 0 42px; font-size: 15px; font-weight: 600; }
-    .wordmark {
-      margin: 0 0 20px;
-      font-family: var(--font-mono);
-      font-size: clamp(38px, 8vw, 58px);
-      font-weight: 700;
-      letter-spacing: -.055em;
-      line-height: 1;
+    .wordmark-logo {
+      width: min(100%, 520px);
+      aspect-ratio: 4 / 1;
+      margin: 0 0 22px;
+      overflow: hidden;
+      border-radius: 6px;
+      background: #fff;
     }
-    .wordmark .data { color: var(--accent); }
+    .wordmark-logo img {
+      display: block;
+      width: 100%;
+      height: auto;
+      transform: translateY(-26%);
+    }
     .dek { max-width: 590px; margin: 0; font-size: 25px; line-height: 1.35; color: var(--text); }
     .status-note { margin: 28px 0 0; color: var(--text-dim); font-size: 10px; text-transform: uppercase; }
 
@@ -297,7 +302,9 @@
     <p class="eyebrow">Product and Engineering Case Study</p>
     <p class="byline">Built in public across eight planned sprints</p>
     <p class="byline-name">Jonathan Ascona</p>
-    <div class="wordmark">BodyBy<span class="data">Data</span></div>
+    <div class="wordmark-logo">
+      <img src="assets/bodybydata-logo.png" alt="BodyByData">
+    </div>
     <p class="dek">A transparent personal health analytics demo, built to turn fragmented sleep, training, and nutrition data into one inspectable daily picture.</p>
     <p class="status-note">Working public demo · React and FastAPI · every score explains its inputs</p>
   </header>
